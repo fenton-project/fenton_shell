@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.bindir            = "bin"
   s.executables       = ["fenton"]
   s.require_paths     = ["lib"]
-  s.files             = %w(Rakefile LICENSE README) + Dir.glob("{lib,tasks,spec}/**/*", File::FNM_DOTMATCH).reject {|f| File.directory?(f) }
+  s.files             = %w(Rakefile LICENSE README) + Dir.glob("{lib}/**/*", File::FNM_DOTMATCH).reject {|f| File.directory?(f) }
 
   s.add_runtime_dependency "excon", "=0.27.6"
   s.add_runtime_dependency "gli", "=2.8.1"
