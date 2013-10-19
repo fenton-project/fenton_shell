@@ -21,7 +21,8 @@ module Fenton
         when 200
           signed_public_key_path = "#{options[:k]}-cer.pub"
           File.open(signed_public_key_path, 'w') { |f| f.write(result_body['signed_public_key']) }
-          puts "#{result_body['message']} (#{signed_public_key_path})"
+          puts "#{result_body['message']}"
+          puts "(#{signed_public_key_path})"
         else
           exit_now!(result_body['message'] || "Signing request failed") #probably make sure sinatra always comes back with this
         end
