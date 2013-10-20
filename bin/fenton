@@ -22,7 +22,7 @@ desc 'Manage your SSH Keys'
 arg_name 'key'
 
 command :key do |c|
-  c.desc 'Sign your local ssh key'
+  c.desc 'Sign your local ssh public key'
   arg_name 'sign'
 
   c.command :sign do |c1|
