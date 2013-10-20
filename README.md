@@ -1,6 +1,6 @@
 # Fenton Shell
 
-This is the CLI client that talks to Fenton Server
+This is the CLI client that talks to [Fenton Server API](https://github.com/fenton-project/server-api)
 
 # Status
 
@@ -52,7 +52,7 @@ Clone, Bundle, Run
 
 # Fenton Project
 
-To manage SSH Keys in a centralized manner
+To manage SSH Keys in a centralized manner. [Fenton Project](https://github.com/fenton-project)
 
 # Contributing
 
@@ -62,7 +62,7 @@ To manage SSH Keys in a centralized manner
 
 # License
 
-Fenton - SSH Key Management
+Fenton Project - SSH Key Management
 
 |                      |                                          |
 |:---------------------|:-----------------------------------------|
