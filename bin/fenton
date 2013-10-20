@@ -14,14 +14,18 @@ version Fenton::VERSION
 desc 'Be verbose'
 switch 'verbose'
 
-desc 'Manage your SSH Keys'
-arg_name 'key'
+sort_help :manually
 
 private_key_default = "#{ENV['HOME']}/.ssh/id_ecdsa"
 public_key_default = "#{private_key_default}.pub"
 
+desc 'Manage your SSH Keys'
+arg_name 'key'
+
 command :key do |c|
   c.desc 'Sign your local ssh key'
+  arg_name 'sign'
+
   c.command :sign do |c1|
     c1.flag [:k, :private_key], desc: "Your SSH Private Key"
     c1.flag [:p, :public_key], desc: "Your SSH Pubic Key"
@@ -46,10 +50,21 @@ command :key do |c|
       Fenton::Key.sign(global_options,options,args)
     end
   end
+
+  c.desc 'Get information about your keys'
+  arg_name 'show'
+
+  c.command :show do |c1|
+    c1.command :ca do |c2|
+      c2.action do |global_options,options,args|
+        Fenton::Key.ca_public_key(global_options,options,args)
+      end
+    end
+  end
 end
 
-on_error do |ex|
+# on_error do |ex|
   
-end
+# end
 
 exit run(ARGV)
