@@ -50,10 +50,6 @@ Clone, Bundle, Run
 
 * Package application as operating system native packages (rpm, deb, etc..)
 
-# Fenton Project
-
-To manage SSH Keys in a centralized manner.
-
 # Contributing
 
 - Fork the project and do your work in a topic branch.
@@ -62,7 +58,7 @@ To manage SSH Keys in a centralized manner.
 
 # License
 
-[Fenton Project](https://github.com/fenton-project) - SSH Key Management
+[Fenton Project](http://fenton-project.github.io/) - SSH Key Management
 
 |                      |                                          |
 |:---------------------|:-----------------------------------------|
