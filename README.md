@@ -52,7 +52,7 @@ Clone, Bundle, Run
 
 # Fenton Project
 
-To manage SSH Keys in a centralized manner. [Fenton Project](https://github.com/fenton-project)
+To manage SSH Keys in a centralized manner.
 
 # Contributing
 
@@ -62,7 +62,7 @@ To manage SSH Keys in a centralized manner. [Fenton Project](https://github.com/
 
 # License
 
-Fenton Project - SSH Key Management
+[Fenton Project](https://github.com/fenton-project) - SSH Key Management
 
 |                      |                                          |
 |:---------------------|:-----------------------------------------|
