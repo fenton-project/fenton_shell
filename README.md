@@ -8,6 +8,15 @@ Alpha, do not use this unless you are developing the app
 
 Version - Check lib/fenton/version.rb
 
+# Getting Started
+
+Clone, Bundle, Run
+
+    git clone git@github.com:fenton-project/server-api.git
+    cd server-api
+    bundle install
+    fenton
+
 # Roadmap
 
 ## 0.1.0
@@ -74,10 +83,11 @@ Here's the basics:
 
 Fenton - SSH Key Management
 
+|                      |                                          |
 |:---------------------|:-----------------------------------------|
-| **Author:**          | Nick Willever (<nickwillever@gmail.com>)
-| **Copyright:**       | Copyright (c) 2013 Nick Willever
-| **License:**         | Apache License, Version 2.0
+| **Author:**          | Nick Willever (<nickwillever@gmail.com>) |
+| **Copyright:**       | Copyright (c) 2013 Nick Willever         |
+| **License:**         | Apache License, Version 2.0              |
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
