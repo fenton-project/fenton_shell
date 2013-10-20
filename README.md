@@ -54,25 +54,6 @@ Clone, Bundle, Run
 
 To manage SSH Keys in a centralized manner
 
-## Why?
-
-User management is boring and tedious, it comes down to one thing, someone you trust needs to get access to your servers.  What do you do?  For loop with ssh -n FTW.  And what about when you stop trusting that person? Yeah... and when you have utility computing everywhere doing that loop a couple times a day or even through a configuration management tool is not worth the trouble.
-
-Instead use SSH Certificates they allow you to configure a server for trusting signed user SSH keys.  It will allow you to:
-* Sign them for specific time period
-* Revoke them
-* Option to share 1 account or give each user their own account
-* Great for vendors, contractors, etc...
-* Great for machine access like nagios and others
-* Can force commands without the problem of SFTP and such
-* Can lock the signed key to specific hosts and where the hosts are being accessed from
-
-Here's the basics: 
-* Create a CA private & public key
-* Add the CA public key to the server that is needing to be accessed
-* Sign the user's public ssh key with the CA private key (creates a file <privatekey>-cert.pub)
-* They can now ssh with their private key because of the *-cert.pub file
-
 # Contributing
 
 - Fork the project and do your work in a topic branch.
