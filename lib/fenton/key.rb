@@ -24,14 +24,13 @@ module Fenton
         exit_now!("Invalid public key #{options[:p]}")
       else
         result = Excon.post('http://localhost:9292/api/v1/key/sign', 
-                             :body => URI.encode_www_form(:key => File.read(options[:k]), 
-                                                          :public => File.read(options[:p])),
+                             :body => URI.encode_www_form(:public => File.read(options[:p])),
                              :headers => { "Content-Type" => "application/x-www-form-urlencoded" })
 
         result_body = JSON.parse(result.body)
         case result.status
         when 200
-          signed_public_key_path = "#{options[:k]}-cer.pub"
+          signed_public_key_path = "#{options[:p].gsub('.pub','')}-cert.pub"
           File.open(signed_public_key_path, 'w') { |f| f.write(result_body['signed_public_key']) }
           puts "#{result_body['message']}"
           puts "(#{signed_public_key_path})"

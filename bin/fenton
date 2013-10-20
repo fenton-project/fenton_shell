@@ -16,8 +16,7 @@ switch 'verbose'
 
 sort_help :manually
 
-private_key_default = "#{ENV['HOME']}/.ssh/id_ecdsa"
-public_key_default = "#{private_key_default}.pub"
+public_key_default = "#{ENV['HOME']}/.ssh/id_ecdsa.pub"
 
 desc 'Manage your SSH Keys'
 arg_name 'key'
@@ -27,25 +26,18 @@ command :key do |c|
   arg_name 'sign'
 
   c.command :sign do |c1|
-    c1.flag [:k, :private_key], desc: "Your SSH Private Key"
     c1.flag [:p, :public_key], desc: "Your SSH Pubic Key"
 
     c1.action do |global_options,options,args|
-      puts "Signing public/private key pair."
+      puts "Signing public key."
 
-      if options[:k] != private_key_default && options[:p] != public_key_default
-        options[:k] = ask("Enter private key to submit (#{private_key_default}): ")
-        options[:k] = private_key_default if options[:k].empty?
-        exit_now!("No file found by that name #{options[:k]}") unless File.exists?(options[:k])
-
+      if options[:p] != public_key_default
         options[:p] = ask("Enter public key to submit (#{public_key_default}): ")
         options[:p] = public_key_default if options[:p].empty?
         exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
       end
 
-      [options[:k], options[:p]].each do |f|
-        exit_now!("No file found by that name #{f}") unless File.exists?(f)
-      end
+      exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
       
       Fenton::Key.sign(global_options,options,args)
     end
