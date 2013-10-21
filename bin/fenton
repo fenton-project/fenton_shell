@@ -16,12 +16,41 @@ switch 'verbose'
 
 sort_help :manually
 
-public_key_default = "#{ENV['HOME']}/.ssh/id_ecdsa.pub"
+private_key_default = "#{ENV['HOME']}/.ssh/id_ecdsa"
+public_key_default = "#{private_key_default}.pub"
 
 desc 'Manage your SSH Keys'
 arg_name 'key'
 
 command :key do |c|
+  c.default_desc "Manage your SSH Keys"
+
+  c.desc 'Generate a local ssh key'
+  arg_name 'generate'
+
+  c.command :generate do |c1|
+    c1.flag [:k, :private_key], desc: "Private key file path to use"
+    c1.flag [:P, :passphrase], desc: "Passphrase that protects the private key"
+
+    c1.action do |global_options,options,args|
+      puts "Generating keys"
+
+      if options[:k] != private_key_default
+        options[:k] = ask("Enter private key to create (#{private_key_default}): ")
+        options[:k] = private_key_default if options[:k].empty?
+        
+        if File.exists?(options[:k])
+          answer = ask("File exists, overwrite? (y/N) ")
+          exit unless answer =~ /^y$/i
+        end
+      end
+
+      options[:P] ||= ask("Enter passphrase: ") { |i| i.echo = "*" }
+      
+      # Fenton::Key.generate(global_options,options,args)
+    end
+  end
+
   c.desc 'Sign your local ssh public key'
   arg_name 'sign'
 
@@ -54,6 +83,25 @@ command :key do |c|
     end
   end
 end
+
+# desc 'SSH to servers the Fenton way'
+# arg_name 'ssh'
+
+# command :ssh do |c|
+#   c.action do |global_options,options,args|
+#     c1.flag [:p, :public_key], desc: "Your SSH Pubic Key"
+
+#     if options[:p] != public_key_default
+#       options[:p] = ask("Enter public key to submit (#{public_key_default}): ")
+#       options[:p] = public_key_default if options[:p].empty?
+#       exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
+#     end
+
+#     exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
+    
+#     Fenton::Ssh.ssh(global_options,options,args)
+#   end
+# end
 
 # on_error do |ex|
   
