@@ -1,19 +1,7 @@
 module Fenton
-  class Key
-    def self.validate_public(public_key)
-      return true #maybe later
-    end
-
-    def self.ca_public_key(global_options,options,args)
-      result = Excon.get('http://localhost:9292/key/ca_public_key')
-
-      result_body = JSON.parse(result.body)
-      case result.status
-      when 200
-        puts result_body['ca_public_key']
-      else
-        exit_now!(result_body['message'])
-      end
+  class Client
+    def self.signup(global_options,options,args)
+      
     end
 
     def self.sign(global_options,options,args)

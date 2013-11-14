@@ -21,8 +21,8 @@ Clone, Bundle, Run
 
 ## 0.1.0
 
-* Create public key if user doesn't have one saved
 * Generate private and public key for the user
+* Create public key if user doesn't have one saved
 * Ability to login to a server from signed keys
 * Ability to configure an OpenSSH server to use the CA public key
 * Validate this works on specific OpenSSH versions 5.9p+ most likely

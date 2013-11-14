@@ -3,6 +3,11 @@
 require 'fenton'
 require 'gli'
 require 'highline/import'
+require 'excon'
+require 'json'
+require 'rbnacl'
+require 'base64'
+require 'digest'
 
 include GLI::App
 
@@ -16,8 +21,48 @@ switch 'verbose'
 
 sort_help :manually
 
-private_key_default = "#{ENV['HOME']}/.ssh/id_ecdsa"
+private_key_default = "#{Dir.home}/.ssh/id_ecdsa"
 public_key_default = "#{private_key_default}.pub"
+
+flag [:d, :directory], desc: "Fenton Directory Path", :default_value => "#{Dir.home}/.fenton"
+
+desc 'Client Management'
+arg_name 'client'
+
+command :client do |c|
+  c.default_desc "Manage Client Access"
+
+  c.flag [:u, :username], desc: "Username", :default_value => ENV['USER']
+  c.flag [:e, :email], desc: "Email"
+
+  c.desc 'Signup'
+  arg_name 'signup'
+
+  c.command :signup do |c1|
+    c1.action do |global_options,options,args|
+      help_now!('username is required') if options[:username].nil?
+      help_now!('email is required') if options[:email].nil?
+
+      begin
+        Dir.mkdir(global_options[:directory])
+      rescue Errno::EEXIST => e
+        exit 1 unless e.message =~ /File exists/
+      end
+
+      if File.exists?("#{global_options[:directory]}/config")
+        answer = ask("File exists #{global_options[:directory]}/config, overwrite? (y/N) ")
+        exit unless answer =~ /^y$/i
+      end
+
+      if File.exists?("#{global_options[:directory]}/auth.key")
+        answer = ask("File exists #{global_options[:directory]}/auth.key, overwrite? (y/N) ")
+        exit unless answer =~ /^y$/i
+      end
+
+      Fenton::User.signup(global_options,options,args)
+    end
+  end
+end
 
 desc 'Manage your SSH Keys'
 arg_name 'key'
