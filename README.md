@@ -21,6 +21,7 @@ Clone, Bundle, Run
 
 ## 0.1.0
 
+* Ability to pass username, password during calls (ewww, maybe auth with private ssh key?)
 * Generate private and public key for the user
 * Create public key if user doesn't have one saved
 * Ability to login to a server from signed keys
@@ -31,7 +32,6 @@ Clone, Bundle, Run
 
 ## 0.2.0
 
-* Ability to pass username, password during calls (ewww, maybe auth with private ssh key?)
 * Requests to generate teams, projects, users, roles
 * Ability to see your teams and projects
 * Request that brings down what the sshd_config will look like per team and/or project

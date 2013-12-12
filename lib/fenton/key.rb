@@ -1,11 +1,23 @@
 module Fenton
   class Key
+    def self.decode(key)
+      return Base64.urlsafe_decode64(key)
+    end
+
+    def self.encode(key)
+      return Base64.urlsafe_encode64(key)
+    end
+
+    def self.sha(key)
+      return Digest::SHA512.hexdigest(key)
+    end
+  
     def self.validate_public(public_key)
       return true #maybe later
     end
 
     def self.ca_public_key(global_options,options,args)
-      result = Excon.get('http://localhost:9292/key/ca_public_key')
+      result = Excon.get("#{global_options[:fenton_server_url]}/key/ca_public_key")
 
       result_body = JSON.parse(result.body)
       case result.status
@@ -20,7 +32,7 @@ module Fenton
       if ! validate_public(options[:p])
         exit_now!("Invalid public key #{options[:p]}")
       else
-        result = Excon.post('http://localhost:9292/key/sign', 
+        result = Excon.post("#{global_options[:fenton_server_url]}/key/sign", 
                              :body => URI.encode_www_form(:public => File.read(options[:p])),
                              :headers => { "Content-Type" => "application/x-www-form-urlencoded" })
 

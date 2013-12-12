@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fenton (0.0.1)
+    fenton (0.0.2)
       excon (= 0.27.6)
       gli (= 2.8.1)
       highline (= 1.6.20)
