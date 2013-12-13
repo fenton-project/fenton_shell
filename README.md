@@ -21,25 +21,25 @@ Clone, Bundle, Run
 
 ## 0.1.0
 
-* Ability to pass username, password during calls (ewww, maybe auth with private ssh key?)
+* <del>Ability to pass username, password during calls (ewww, maybe auth with private ssh key?)</del>
+* <del>Ability to login to a server from signed keys</del>
+* <del>Request generating a CA</del>
+* <del>Create a local configuration file for your Fenton Server</del>
 * Generate private and public key for the user
 * Create public key if user doesn't have one saved
-* Ability to login to a server from signed keys
+
+## 0.2.0
+
 * Ability to configure an OpenSSH server to use the CA public key
 * Validate this works on specific OpenSSH versions 5.9p+ most likely
 * Validate this works on specific Operating Systems (CentOS, Ubuntu, Fedora, Amazon)
-* Request generating a CA
 
-## 0.2.0
+## 0.3.0
 
 * Requests to generate teams, projects, users, roles
 * Ability to see your teams and projects
 * Request that brings down what the sshd_config will look like per team and/or project
 * Manage each signed certificate for each team/project (hmm research this one)
-
-## 0.3.0
-
-* Create a local configuration file for your Fenton Server
 
 ## 0.4.0
 
