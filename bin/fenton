@@ -21,7 +21,7 @@ switch 'verbose'
 
 sort_help :manually
 
-private_key_default = "#{Dir.home}/.fenton/id_ecdsa"
+private_key_default = "#{Dir.home}/.ssh/id_ecdsa"
 public_key_default = "#{private_key_default}.pub"
 
 flag [:z, :fenton_server_url], desc: "Fenton Server URL", :default_value => 'http://localhost:9292'
