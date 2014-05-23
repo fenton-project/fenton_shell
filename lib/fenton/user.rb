@@ -4,21 +4,11 @@ module Fenton
       old_key = Auth.get("#{global_options[:directory]}/config")
       new_key = Auth.new.generate
 
-      box = RbNaCl::Box.new(old_key.api_public_key, old_key.private_key)
-      nonce = RbNaCl::Random.random_bytes(box.nonce_bytes)
-      nonce_encoded = Key.encode(nonce)
+      message = {}
+      message.store("auth_public_key_encoded",new_key.public_key_encoded)
+      message.store("email",options[:email])
 
-      ciphertext = box.encrypt(nonce, new_key.public_key_encoded)
-      ciphertext_encoded = Key.encode(ciphertext)
-
-      result = Excon.post("#{global_options[:fenton_server_url]}/users/update", 
-                           :body => URI.encode_www_form(:username => options[:username],
-                                                        :email => options[:email],
-                                                        :message_key_encoded => nonce_encoded,
-                                                        :message_encoded => ciphertext_encoded
-                                                       ),
-                           :headers => { "Content-Type" => "application/x-www-form-urlencoded" })
-
+      result = old_key.send_encoded_message(options[:username],message)
       result_body = JSON.parse(result.body)
 
       case result.status
