@@ -1,6 +1,10 @@
 require 'test/unit'
 
-class Test::Unit::TestCase
-  require 'fenton_shell'
-  include FentonShell
+module Test
+  module Unit
+    class TestCase
+      require 'fenton_shell'
+      include FentonShell
+    end
+  end
 end

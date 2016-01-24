@@ -1,7 +1,6 @@
 module FentonShell
   # Interfaces with the client api on fenton server
   class Client
-
     # @!attribute [r] message
     #   @return [String] success or failure message and why
     attr_accessor :message
@@ -13,41 +12,57 @@ module FentonShell
     # @param options [Hash] json fields to send to fenton server
     # @return [String] success or failure message
 
-    def create(global_options,options)
-      client = {
-        client: {
-          name: options[:name],
-          public_key: File.read(options[:public_key])
-        }
-      }
+    def create(global_options, options)
+      status, body = client_create(global_options, options)
 
-      result = Excon.post(
-        "#{global_options[:fenton_server_url]}/clients.json",
-        body: client.to_json,
-        headers: { "Content-Type" => "application/json" }
-      )
-
-      result_body = JSON.parse(result.body)
-
-      if result.status == 201
-        save_message({'Client': ["created!"]})
+      if status == 201
+        save_message('Client': ['created!'])
         true
       else
-        save_message(result_body)
+        save_message(body)
         false
       end
     end
 
     private
 
+    # Sends a post request with json from the command line client
+    #
+    # @param global_options [Hash] global command line options
+    # @param options [Hash] json fields to send to fenton server
+    # @return [Fixnum] http status code
+    # @return [String] message back from fenton server
+    def client_create(global_options, options)
+      result = Excon.post(
+        "#{global_options[:fenton_server_url]}/clients.json",
+        body: client_json(options),
+        headers: { 'Content-Type' => 'application/json' }
+      )
+
+      [result.status, JSON.parse(result.body)]
+    end
+
+    # Formulates the client json for the post request
+    #
+    # @param options [Hash] fields from fenton command line
+    # @return [String] json created from the options hash
+    def client_json(options)
+      {
+        client: {
+          name: options[:name],
+          public_key: File.read(options[:public_key])
+        }
+      }.to_json
+    end
+
     # Helps output the error message from fenton server
     #
     # @param msg [Hash] fields from fenton public classes
     # @return [String] changed hash fields to string for command line output
-    def save_message(msg={})
-      self.message ||= ""
+    def save_message(msg = {})
+      self.message ||= ''
 
-      msg.each do |key,value|
+      msg.each do |key, value|
         self.message << "#{key.capitalize} #{value.first}\n"
       end
     end

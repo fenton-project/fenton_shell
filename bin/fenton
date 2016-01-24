@@ -8,7 +8,7 @@ include FentonShell
 
 program_desc 'manage and sign SSH Keys from Fenton Server'
 
-desc "Show current version number"
+desc 'Show current version number'
 version FentonShell::VERSION
 
 desc 'Be verbose'
@@ -19,18 +19,20 @@ sort_help :manually
 private_key_default = "#{Dir.home}/.ssh/id_ecdsa"
 public_key_default = "#{private_key_default}.pub"
 
-flag [:z, :fenton_server_url], desc: "Fenton Server URL", :default_value => 'http://localhost:9292'
-flag [:d, :directory], desc: "Fenton Directory Path", :default_value => "#{Dir.home}/.fenton"
+flag [:z, :fenton_server_url], desc: 'Fenton Server URL',
+                               default_value: 'http://localhost:9292'
+flag [:d, :directory], desc: 'Fenton Directory Path',
+                       default_value: "#{Dir.home}/.fenton"
 
 desc 'Project Management'
 arg_name 'project'
 
 command :project do |c|
-  c.default_desc "Manage Projects"
+  c.default_desc 'Manage Projects'
 
-  c.flag [:name], desc: "Name"
-  c.flag [:description], desc: "Description"
-  c.flag [:passphrase], desc: "Passphrase"
+  c.flag [:name], desc: 'Name'
+  c.flag [:description], desc: 'Description'
+  c.flag [:passphrase], desc: 'Passphrase'
 
   @project = Project.new
 
@@ -38,12 +40,12 @@ command :project do |c|
   arg_name 'create'
 
   c.command :create do |c1|
-    c1.action do |global_options,options|
+    c1.action do |global_options, options|
       help_now!('name is required') if options[:name].nil?
       help_now!('description is required') if options[:description].nil?
       help_now!('passphrase is required') if options[:passphrase].nil?
 
-      if @project.create(global_options,options)
+      if @project.create(global_options, options)
         puts @project.message
       else
         exit_now!(@project.message)
@@ -56,10 +58,11 @@ desc 'Client Management'
 arg_name 'client'
 
 command :client do |c|
-  c.default_desc "Manage Clients"
+  c.default_desc 'Manage Clients'
 
-  c.flag [:name], desc: "Name"
-  c.flag [:public_key], desc: "SSH Public Key", :default_value => "#{Dir.home}/.ssh/id_rsa"
+  c.flag [:name], desc: 'Name'
+  c.flag [:public_key], desc: 'SSH Public Key',
+                        default_value: public_key_default
 
   @client = Client.new
 
@@ -67,11 +70,11 @@ command :client do |c|
   arg_name 'create'
 
   c.command :create do |c1|
-    c1.action do |global_options,options|
+    c1.action do |global_options, options|
       help_now!('name is required') if options[:name].nil?
       help_now!('public_key is required') if options[:public_key].nil?
 
-      if @client.create(global_options,options)
+      if @client.create(global_options, options)
         puts @client.message
       else
         exit_now!(@client.message)

@@ -1,15 +1,18 @@
-require "bundler/gem_tasks"
+require 'bundler/gem_tasks'
 require 'rake/clean'
 require 'rubygems'
 require 'rubygems/package_task'
 require 'yard'
 require 'cucumber'
 require 'cucumber/rake/task'
+require 'rubocop/rake_task'
+
+RuboCop::RakeTask.new
 
 # http://www.rubydoc.info/gems/yard/file/docs/Tags.md
 
 YARD::Rake::YardocTask.new do |t|
-  t.files   = ['lib/**/*.rb', '-', 'bin/**/*']
+  t.files = ['lib/**/*.rb', '-', 'bin/**/*']
   t.stats_options = ['--list-undoc']
 end
 
@@ -18,7 +21,7 @@ spec = eval(File.read('fenton_shell.gemspec'))
 Gem::PackageTask.new(spec) do |pkg|
 end
 
-CUKE_RESULTS = 'coverage/results.html'
+CUKE_RESULTS = 'coverage/results.html'.freeze
 CLEAN << CUKE_RESULTS
 
 desc 'Run features'
@@ -32,18 +35,19 @@ end
 desc 'Run features tagged as work-in-progress (@wip)'
 Cucumber::Rake::Task.new('features:wip') do |t|
   tag_opts = ' --tags ~@pending'
-  tag_opts = ' --tags @wip'
-  t.cucumber_opts = "features --format html -o #{CUKE_RESULTS} --format pretty -x -s#{tag_opts}"
+  tag_opts += ' --tags @wip'
+  t.cucumber_opts = "features --format html -o #{CUKE_RESULTS} " \
+    "--format pretty -x -s#{tag_opts}"
   t.fork = false
 end
 
-task :cucumber => :features
+task cucumber: :features
 task 'cucumber:wip' => 'features:wip'
-task :wip => 'features:wip'
+task wip: 'features:wip'
 require 'rake/testtask'
 Rake::TestTask.new do |t|
-  t.libs << "test"
+  t.libs << 'test'
   t.test_files = FileList['test/*_test.rb']
 end
 
-task :default => [:test,:features]
+task default: [:test, :features]

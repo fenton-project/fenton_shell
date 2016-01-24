@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class ProjectTest < Test::Unit::TestCase
-
   def setup
     @project = Project.new
   end
@@ -29,7 +28,7 @@ class ProjectTest < Test::Unit::TestCase
   end
 
   def test_project_creation
-    project_result = @project.create(global_options,options)
+    project_result = @project.create(global_options, options)
 
     assert project_result
     assert_equal "Project created!\n", @project.message
@@ -38,7 +37,7 @@ class ProjectTest < Test::Unit::TestCase
   def test_project_creation_missing_name
     skewed_options = options
     skewed_options.delete(:name)
-    project_result = @project.create(global_options,skewed_options)
+    project_result = @project.create(global_options, skewed_options)
 
     refute project_result
     assert_equal "Name can't be blank\n", @project.message
@@ -47,7 +46,7 @@ class ProjectTest < Test::Unit::TestCase
   def test_project_creation_missing_description
     skewed_options = options
     skewed_options.delete(:description)
-    project_result = @project.create(global_options,skewed_options)
+    project_result = @project.create(global_options, skewed_options)
 
     refute project_result
     assert_equal "Description can't be blank\n", @project.message
@@ -56,7 +55,7 @@ class ProjectTest < Test::Unit::TestCase
   def test_project_creation_missing_passphrase
     skewed_options = options
     skewed_options.delete(:passphrase)
-    project_result = @project.create(global_options,skewed_options)
+    project_result = @project.create(global_options, skewed_options)
 
     refute project_result
     assert_equal "Passphrase can't be blank\n", @project.message
