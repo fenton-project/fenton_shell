@@ -6,8 +6,3 @@ Before do |scenario|
   ::File.write(@public_key_path,
                ::SSHKey.generate(type: 'RSA', bits: 256).ssh_public_key)
 end
-
-After do |scenario|
-  next unless scenario.name =~ %r{.*client}
-  ::FileUtils.rm_r(@public_key_path)
-end

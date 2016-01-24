@@ -23,10 +23,6 @@ class ProjectTest < Test::Unit::TestCase
     }
   end
 
-  def args
-    {}
-  end
-
   def test_project_creation
     project_result = @project.create(global_options, options)
 

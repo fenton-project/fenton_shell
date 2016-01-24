@@ -16,7 +16,7 @@ switch 'verbose'
 
 sort_help :manually
 
-private_key_default = "#{Dir.home}/.ssh/id_ecdsa"
+private_key_default = "#{Dir.home}/.ssh/id_rsa"
 public_key_default = "#{private_key_default}.pub"
 
 flag [:z, :fenton_server_url], desc: 'Fenton Server URL',
@@ -83,6 +83,76 @@ command :client do |c|
   end
 end
 
+desc 'SSH Key Management'
+arg_name 'key'
+
+command :key do |c|
+  c.default_desc 'Manage your SSH Keys'
+
+  c.flag [:type], desc: 'RSA or DSA', default_value: 'rsa'
+  c.flag [:bits], desc: 'Size of key', type: Integer, default_value: 4096
+
+  @key = Key.new
+
+  c.desc 'Generate a ssh key'
+  arg_name 'generate'
+
+  c.command :generate do |c1|
+    c1.flag [:private_key], desc: 'Private key file path to use',
+                            default_value: private_key_default
+    c1.flag [:passphrase], desc: 'Passphrase that protects the private key'
+
+    c1.action do |_global_options, options, _args|
+      puts "Generating key at #{options[:private_key]}"
+
+      if File.exist?(options[:private_key])
+        answer = ask('File exists, overwrite? (y/N) ')
+        exit_now!('choose a different file path') unless answer =~ %r{^y$}i
+      end
+
+      options[:passphrase] ||= ask('Enter passphrase: ') { |i| i.echo = '*' }
+
+      if @key.create(options)
+        puts @key.message
+      else
+        exit_now!(@key.message)
+      end
+    end
+  end
+
+  # c.desc 'Sign your local ssh public key'
+  # arg_name 'sign'
+
+  # c.command :sign do |c1|
+  #   c1.flag [:p, :public_key], desc: "Your SSH Pubic Key"
+
+  #   c1.action do |global_options,options,args|
+  #     puts "Signing public key."
+
+  #     if options[:p] != public_key_default
+  #       options[:p] = ask("Enter public key to submit (#{public_key_default}): ")
+  #       options[:p] = public_key_default if options[:p].empty?
+  #       exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
+  #     end
+
+  #     exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
+
+  #     FentonShell::Key.sign(global_options,options,args)
+  #   end
+  # end
+
+  # c.desc 'Get information about your keys'
+  # arg_name 'show'
+
+  # c.command :show do |c1|
+  #   c1.command :ca do |c2|
+  #     c2.action do |global_options,options,args|
+  #       FentonShell::Key.ca_public_key(global_options,options,args)
+  #     end
+  #   end
+  # end
+end
+
 # desc 'Client Management'
 # arg_name 'client'
 
@@ -131,71 +201,6 @@ end
 #       help_now!('email is required') if options[:email].nil?
 
 #       FentonShell::User.update(global_options,options,args)
-#     end
-#   end
-# end
-
-# desc 'Manage your SSH Keys'
-# arg_name 'key'
-
-# command :key do |c|
-#   c.default_desc "Manage your SSH Keys"
-
-#   c.desc 'Generate a local ssh key'
-#   arg_name 'generate'
-
-#   c.command :generate do |c1|
-#     c1.flag [:k, :private_key], desc: "Private key file path to use"
-#     c1.flag [:P, :passphrase], desc: "Passphrase that protects the private key"
-
-#     c1.action do |global_options,options,args|
-#       puts "Generating keys"
-
-#       if options[:k] != private_key_default
-#         options[:k] = ask("Enter private key to create (#{private_key_default}): ")
-#         options[:k] = private_key_default if options[:k].empty?
-
-#         if File.exists?(options[:k])
-#           answer = ask("File exists, overwrite? (y/N) ")
-#           exit unless answer =~ /^y$/i
-#         end
-#       end
-
-#       options[:P] ||= ask("Enter passphrase: ") { |i| i.echo = "*" }
-
-#       # FentonShell::Key.generate(global_options,options,args)
-#     end
-#   end
-
-#   c.desc 'Sign your local ssh public key'
-#   arg_name 'sign'
-
-#   c.command :sign do |c1|
-#     c1.flag [:p, :public_key], desc: "Your SSH Pubic Key"
-
-#     c1.action do |global_options,options,args|
-#       puts "Signing public key."
-
-#       if options[:p] != public_key_default
-#         options[:p] = ask("Enter public key to submit (#{public_key_default}): ")
-#         options[:p] = public_key_default if options[:p].empty?
-#         exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
-#       end
-
-#       exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
-
-#       FentonShell::Key.sign(global_options,options,args)
-#     end
-#   end
-
-#   c.desc 'Get information about your keys'
-#   arg_name 'show'
-
-#   c.command :show do |c1|
-#     c1.command :ca do |c2|
-#       c2.action do |global_options,options,args|
-#         FentonShell::Key.ca_public_key(global_options,options,args)
-#       end
 #     end
 #   end
 # end

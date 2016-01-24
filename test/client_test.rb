@@ -30,10 +30,6 @@ class ClientTest < Test::Unit::TestCase
     }
   end
 
-  def args
-    {}
-  end
-
   def test_client_creation
     client_result = @client.create(global_options, options)
 
