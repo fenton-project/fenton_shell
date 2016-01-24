@@ -1,76 +1,84 @@
 # Fenton Shell
 
-This is the CLI client that talks to [Fenton Server API](https://github.com/fenton-project/server-api)
+Interacts with Fenton Server to download a signed SSH key for authentication to a server running OpenSSH 5.9+ and configured to use SSH Certificate authentication for the Fenton Project
 
-# Status
+{Fenton Project}[https://fenton-project.github.io/] - SSH Key Management
 
-Alpha, do not use this unless you are developing the app
+## Production Deployment
 
-Version - Check lib/fenton/version.rb
+Not recommended at this time
 
-# Getting Started
+### Shell Completion
 
-Clone, Bundle, Run
+```
+complete -F get_fenton_targets fenton
+function get_fenton_targets()
+{
+  if [ -z $2 ] ; then
+    COMPREPLY=(`fenton help -c`)
+  else
+    COMPREPLY=(`fenton help -c $2`)
+  fi
+}
+```
 
-    git clone git@github.com:fenton-project/server-api.git
-    cd server-api
+## Developer Setup
+
+#### Getting started
+
+    git clone git@github.com:fenton-project/fenton_shell.git
+    cd fenton_shell
     bundle install
-    fenton
+    bundle exec ./bin/fenton
 
-# Roadmap
+#### Ruby version
 
-## 0.1.0
+  See gemspec[fenton_shell.gemspec]
 
-* <del>Ability to pass username, password during calls (ewww, maybe auth with private ssh key?)</del>
-* <del>Ability to login to a server from signed keys</del>
-* <del>Request generating a CA</del>
-* <del>Create a local configuration file for your Fenton Server</del>
-* Generate private and public key for the user
-* Create public key if user doesn't have one saved
+#### System dependencies
 
-## 0.2.0
+  OpenSSH 5.9 or higher
 
-* Ability to configure an OpenSSH server to use the CA public key
-* Validate this works on specific OpenSSH versions 5.9p+ most likely
-* Validate this works on specific Operating Systems (CentOS, Ubuntu, Fedora, Amazon)
+#### Configuration
 
-## 0.3.0
+  Fenton creates configuration files here: `~/.fenton/`
 
-* Requests to generate teams, projects, users, roles
-* Ability to see your teams and projects
-* Request that brings down what the sshd_config will look like per team and/or project
-* Manage each signed certificate for each team/project (hmm research this one)
+#### How to run the test suite
 
-## 0.4.0
+    bundle exec rake test
+    bundle exec rake features
 
-* Ability to send requests to revoke keys
-* Ability to see who has requested access
+#### Build documentation
 
-## 0.5.0
+    bundle exec rake yard
+    bundle exec yard server
 
-* Package application as operating system native packages (rpm, deb, etc..)
+## Contributing
 
-# Contributing
-
+- Open an issue (please note if you'll be working on it or need assistance)
 - Fork the project and do your work in a topic branch.
 - Rebase your branch to make sure everything is up to date.
-- Commit your changes and send a pull request.
+- Commit your changes & tests, then send a pull request.
 
-# License
+## License
 
-[Fenton Project](http://fenton-project.github.io/) - SSH Key Management
+#### Author
 
-|                      |                                          |
-|:---------------------|:-----------------------------------------|
-| **Author:**          | Nick Willever (<nickwillever@gmail.com>) |
-| **Copyright:**       | Copyright (c) 2013 Nick Willever         |
-| **License:**         | Apache License, Version 2.0              |
+  Nick Willever (<nickwillever@gmail.com>)
+
+#### Copyright
+
+  Copyright (c) 2013-2016 Nick Willever
+
+#### License
+
+Apache License, Version 2.0
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+  https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,

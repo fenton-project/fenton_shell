@@ -1,20 +1,15 @@
 #!/usr/bin/env ruby
 
-require 'fenton'
+require 'fenton_shell'
 require 'gli'
-require 'highline/import'
-require 'excon'
-require 'json'
-require 'rbnacl'
-require 'base64'
-require 'digest'
 
 include GLI::App
+include FentonShell
 
 program_desc 'manage and sign SSH Keys from Fenton Server'
 
 desc "Show current version number"
-version Fenton::VERSION
+version FentonShell::VERSION
 
 desc 'Be verbose'
 switch 'verbose'
@@ -27,38 +22,32 @@ public_key_default = "#{private_key_default}.pub"
 flag [:z, :fenton_server_url], desc: "Fenton Server URL", :default_value => 'http://localhost:9292'
 flag [:d, :directory], desc: "Fenton Directory Path", :default_value => "#{Dir.home}/.fenton"
 
-desc 'Client Management'
-arg_name 'client'
+desc 'Project Management'
+arg_name 'project'
 
-command :client do |c|
-  c.default_desc "Manage Client Access"
+command :project do |c|
+  c.default_desc "Manage Projects"
 
-  c.flag [:u, :username], desc: "Username", :default_value => ENV['USER']
-  c.flag [:e, :email], desc: "Email"
+  c.flag [:name], desc: "Name"
+  c.flag [:description], desc: "Description"
+  c.flag [:passphrase], desc: "Passphrase"
 
-  c.desc 'Signup'
-  arg_name 'signup'
+  @project = Project.new
 
-  c.command :signup do |c1|
-    c1.action do |global_options,options,args|
-      help_now!('username is required') if options[:username].nil?
-      help_now!('email is required') if options[:email].nil?
+  c.desc 'Create'
+  arg_name 'create'
 
-      begin
-        Dir.mkdir(global_options[:directory])
-      rescue Errno::EEXIST => e
-        unless e.message =~ /File exists/
-          puts e.message
-          exit 1
-        end
+  c.command :create do |c1|
+    c1.action do |global_options,options|
+      help_now!('name is required') if options[:name].nil?
+      help_now!('description is required') if options[:description].nil?
+      help_now!('passphrase is required') if options[:passphrase].nil?
+
+      if @project.create(global_options,options)
+        puts @project.message
+      else
+        exit_now!(@project.message)
       end
-
-      if File.exists?("#{global_options[:directory]}/config")
-        answer = ask("File exists #{global_options[:directory]}/config, overwrite? (y/N) ")
-        exit unless answer =~ /^y$/i
-      end
-
-      Fenton::User.signup(global_options,options,args)
     end
   end
 
@@ -73,76 +62,128 @@ command :client do |c|
 
       help_now!('username is required') if options[:username].nil?
       help_now!('email is required') if options[:email].nil?
-      
-      Fenton::User.update(global_options,options,args)
+
+      FentonShell::User.update(global_options,options,args)
     end
   end
 end
 
-desc 'Manage your SSH Keys'
-arg_name 'key'
+# desc 'Client Management'
+# arg_name 'client'
 
-command :key do |c|
-  c.default_desc "Manage your SSH Keys"
+# command :client do |c|
+#   c.default_desc "Manage Client Access"
 
-  c.desc 'Generate a local ssh key'
-  arg_name 'generate'
+#   c.flag [:u, :username], desc: "Username", :default_value => ENV['USER']
+#   c.flag [:e, :email], desc: "Email"
 
-  c.command :generate do |c1|
-    c1.flag [:k, :private_key], desc: "Private key file path to use"
-    c1.flag [:P, :passphrase], desc: "Passphrase that protects the private key"
+#   c.desc 'Signup'
+#   arg_name 'signup'
 
-    c1.action do |global_options,options,args|
-      puts "Generating keys"
+#   c.command :signup do |c1|
+#     c1.action do |global_options,options,args|
+#       help_now!('username is required') if options[:username].nil?
+#       help_now!('email is required') if options[:email].nil?
 
-      if options[:k] != private_key_default
-        options[:k] = ask("Enter private key to create (#{private_key_default}): ")
-        options[:k] = private_key_default if options[:k].empty?
-        
-        if File.exists?(options[:k])
-          answer = ask("File exists, overwrite? (y/N) ")
-          exit unless answer =~ /^y$/i
-        end
-      end
+#       begin
+#         Dir.mkdir(global_options[:directory])
+#       rescue Errno::EEXIST => e
+#         unless e.message =~ /File exists/
+#           puts e.message
+#           exit 1
+#         end
+#       end
 
-      options[:P] ||= ask("Enter passphrase: ") { |i| i.echo = "*" }
-      
-      # Fenton::Key.generate(global_options,options,args)
-    end
-  end
+#       if File.exists?("#{global_options[:directory]}/config")
+#         answer = ask("File exists #{global_options[:directory]}/config, overwrite? (y/N) ")
+#         exit unless answer =~ /^y$/i
+#       end
 
-  c.desc 'Sign your local ssh public key'
-  arg_name 'sign'
+#       FentonShell::User.signup(global_options,options,args)
+#     end
+#   end
 
-  c.command :sign do |c1|
-    c1.flag [:p, :public_key], desc: "Your SSH Pubic Key"
+#   c.desc 'Update'
+#   arg_name 'update'
 
-    c1.action do |global_options,options,args|
-      puts "Signing public key."
+#   c.command :update do |c1|
+#     c1.action do |global_options,options,args|
+#       config = YAML.load_file("#{global_options[:directory]}/config")
+#       options[:username]||= config[:username]
+#       options[:email]||= config[:email]
 
-      if options[:p] != public_key_default
-        options[:p] = ask("Enter public key to submit (#{public_key_default}): ")
-        options[:p] = public_key_default if options[:p].empty?
-        exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
-      end
+#       help_now!('username is required') if options[:username].nil?
+#       help_now!('email is required') if options[:email].nil?
 
-      exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
-      
-      Fenton::Key.sign(global_options,options,args)
-    end
-  end
+#       FentonShell::User.update(global_options,options,args)
+#     end
+#   end
+# end
 
-  c.desc 'Get information about your keys'
-  arg_name 'show'
+# desc 'Manage your SSH Keys'
+# arg_name 'key'
 
-  c.command :show do |c1|
-    c1.command :ca do |c2|
-      c2.action do |global_options,options,args|
-        Fenton::Key.ca_public_key(global_options,options,args)
-      end
-    end
-  end
-end
+# command :key do |c|
+#   c.default_desc "Manage your SSH Keys"
+
+#   c.desc 'Generate a local ssh key'
+#   arg_name 'generate'
+
+#   c.command :generate do |c1|
+#     c1.flag [:k, :private_key], desc: "Private key file path to use"
+#     c1.flag [:P, :passphrase], desc: "Passphrase that protects the private key"
+
+#     c1.action do |global_options,options,args|
+#       puts "Generating keys"
+
+#       if options[:k] != private_key_default
+#         options[:k] = ask("Enter private key to create (#{private_key_default}): ")
+#         options[:k] = private_key_default if options[:k].empty?
+
+#         if File.exists?(options[:k])
+#           answer = ask("File exists, overwrite? (y/N) ")
+#           exit unless answer =~ /^y$/i
+#         end
+#       end
+
+#       options[:P] ||= ask("Enter passphrase: ") { |i| i.echo = "*" }
+
+#       # FentonShell::Key.generate(global_options,options,args)
+#     end
+#   end
+
+#   c.desc 'Sign your local ssh public key'
+#   arg_name 'sign'
+
+#   c.command :sign do |c1|
+#     c1.flag [:p, :public_key], desc: "Your SSH Pubic Key"
+
+#     c1.action do |global_options,options,args|
+#       puts "Signing public key."
+
+#       if options[:p] != public_key_default
+#         options[:p] = ask("Enter public key to submit (#{public_key_default}): ")
+#         options[:p] = public_key_default if options[:p].empty?
+#         exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
+#       end
+
+#       exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
+
+#       FentonShell::Key.sign(global_options,options,args)
+#     end
+#   end
+
+#   c.desc 'Get information about your keys'
+#   arg_name 'show'
+
+#   c.command :show do |c1|
+#     c1.command :ca do |c2|
+#       c2.action do |global_options,options,args|
+#         FentonShell::Key.ca_public_key(global_options,options,args)
+#       end
+#     end
+#   end
+# end
 
 # desc 'SSH to servers the Fenton way'
 # arg_name 'ssh'
@@ -158,13 +199,13 @@ end
 #     end
 
 #     exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
-    
-#     Fenton::Ssh.ssh(global_options,options,args)
+
+#     FentonShell::Ssh.ssh(global_options,options,args)
 #   end
 # end
 
 # on_error do |ex|
-  
+
 # end
 
 exit run(ARGV)
