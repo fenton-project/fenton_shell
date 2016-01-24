@@ -22,9 +22,10 @@ Gem::Specification.new do |s|
   s.require_paths     = ["lib"]
   s.files             = %w(Rakefile LICENSE README.md) + Dir.glob("{lib}/**/*", File::FNM_DOTMATCH).reject {|f| File.directory?(f) }
 
-  s.add_runtime_dependency "excon", "=0.27.6"
-  s.add_runtime_dependency "gli", "=2.8.1"
-  s.add_runtime_dependency "json", "=1.8.1"
+  s.add_runtime_dependency "excon", "~>0.45.4"
+  s.add_runtime_dependency "gli", "~>2.13.4"
+  s.add_runtime_dependency "json", "~>1.8.3"
+  s.add_runtime_dependency "sshkey", "~>1.8.0"
 
   s.add_development_dependency('rake')
   s.add_development_dependency('aruba')

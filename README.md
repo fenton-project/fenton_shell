@@ -2,7 +2,7 @@
 
 Interacts with Fenton Server to download a signed SSH key for authentication to a server running OpenSSH 5.9+ and configured to use SSH Certificate authentication for the Fenton Project
 
-{Fenton Project}[https://fenton-project.github.io/] - SSH Key Management
+[Fenton Project](https://fenton-project.github.io/) - SSH Key Management
 
 ## Production Deployment
 
@@ -33,7 +33,7 @@ function get_fenton_targets()
 
 #### Ruby version
 
-  See gemspec[fenton_shell.gemspec]
+  See [gemspec](fenton_shell.gemspec)
 
 #### System dependencies
 

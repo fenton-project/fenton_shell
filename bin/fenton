@@ -50,20 +50,32 @@ command :project do |c|
       end
     end
   end
+end
 
-  c.desc 'Update'
-  arg_name 'update'
+desc 'Client Management'
+arg_name 'client'
 
-  c.command :update do |c1|
-    c1.action do |global_options,options,args|
-      config = YAML.load_file("#{global_options[:directory]}/config")
-      options[:username]||= config[:username]
-      options[:email]||= config[:email]
+command :client do |c|
+  c.default_desc "Manage Clients"
 
-      help_now!('username is required') if options[:username].nil?
-      help_now!('email is required') if options[:email].nil?
+  c.flag [:name], desc: "Name"
+  c.flag [:public_key], desc: "SSH Public Key", :default_value => "#{Dir.home}/.ssh/id_rsa"
 
-      FentonShell::User.update(global_options,options,args)
+  @client = Client.new
+
+  c.desc 'Create'
+  arg_name 'create'
+
+  c.command :create do |c1|
+    c1.action do |global_options,options|
+      help_now!('name is required') if options[:name].nil?
+      help_now!('public_key is required') if options[:public_key].nil?
+
+      if @client.create(global_options,options)
+        puts @client.message
+      else
+        exit_now!(@client.message)
+      end
     end
   end
 end

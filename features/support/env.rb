@@ -1,4 +1,4 @@
-# http://www.relishapp.com/cucumber/aruba/v/0-11-0/docs/getting-started
+# https://github.com/cucumber/aruba/tree/master/features/getting_started
 
 require 'aruba/cucumber'
 
