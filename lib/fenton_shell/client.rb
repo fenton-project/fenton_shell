@@ -24,6 +24,33 @@ module FentonShell
       end
     end
 
+    # Calls create new client then creates an organization for that client
+    # via a post request with json from the command line
+    #
+    # @param global_options [Hash] global command line options
+    # @param options [Hash] json fields to send to fenton server
+    # @return [String] success or failure message
+
+    def create_with_organization(global_options, options)
+      if create(global_options, options)
+        organization_options = {
+          name: options[:username],
+          key: options[:username],
+          clients: [options[:username]]
+        }
+
+        organization = Organization.new
+
+        if organization.create(global_options, organization_options)
+          save_message('Organization': ['created!'])
+          true
+        else
+          save_message('Organization': ['not created!'])
+          false
+        end
+      end
+    end
+
     private
 
     # Sends a post request with json from the command line client

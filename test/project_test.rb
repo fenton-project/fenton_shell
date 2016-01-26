@@ -19,7 +19,9 @@ class ProjectTest < Test::Unit::TestCase
     {
       name: 'Production Machines',
       description: 'Machines in production',
-      passphrase: 'Foobar'
+      passphrase: 'Foobar',
+      key: 'productionmachines',
+      organization: 'myorg'
     }
   end
 

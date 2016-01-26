@@ -1,6 +1,5 @@
 require 'test_helper'
 require 'sshkey'
-require 'tempfile'
 require 'fileutils'
 
 class ClientTest < Test::Unit::TestCase
@@ -25,7 +24,10 @@ class ClientTest < Test::Unit::TestCase
 
   def options
     {
+      username: 'foobarz',
       name: 'Foo Barz',
+      email: 'FooBarz@example.com',
+      password: 'Foo Barz',
       public_key: @public_key_path
     }
   end

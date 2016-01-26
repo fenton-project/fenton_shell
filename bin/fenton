@@ -24,6 +24,77 @@ flag [:z, :fenton_server_url], desc: 'Fenton Server URL',
 flag [:d, :directory], desc: 'Fenton Directory Path',
                        default_value: "#{Dir.home}/.fenton"
 
+desc 'Client Management'
+arg_name 'client'
+
+command :client do |c|
+  c.default_desc 'Manage Clients'
+
+  c.flag [:name], desc: 'Name'
+  c.flag [:email], desc: 'Email'
+  c.flag [:password], desc: 'Password'
+  c.flag [:public_key], desc: 'SSH Public Key',
+                        default_value: public_key_default
+
+  @client = Client.new
+
+  c.desc 'Create an account (<username> --name --email --password --public_key)'
+  arg_name 'signup'
+
+  c.command :signup do |c1|
+    c1.action do |global_options, options, args|
+      help_now!('username is required') if args.empty?
+      options[:username] = args.first
+
+      puts "Creating client with username: #{options[:username]}\n\n"
+      options[:name] ||= ask('Name: ')
+      options[:email] ||= ask('Email: ')
+      options[:password] ||= ask('Create a password: ') { |i| i.echo = '*' }
+
+      help_now!('username is required') if options[:username].nil?
+      help_now!('name is required') if options[:name].nil?
+      help_now!('email is required') if options[:email].nil?
+      help_now!('password is required') if options[:password].nil?
+      help_now!('public_key is required') if options[:public_key].nil?
+
+      if @client.create_with_organization(global_options, options)
+        puts
+        puts @client.message
+      else
+        exit_now!(@client.message)
+      end
+    end
+  end
+end
+
+desc 'Organization Management'
+arg_name 'organization'
+
+command :organization do |c|
+  c.default_desc 'Manage Organizations'
+
+  c.flag [:name], desc: 'Name'
+  c.flag [:key], desc: 'Key'
+
+  @organization = Organization.new
+
+  c.desc 'Create'
+  arg_name 'create'
+
+  c.command :create do |c1|
+    c1.action do |global_options, options|
+      help_now!('name is required') if options[:name].nil?
+      help_now!('key is required') if options[:key].nil?
+
+      if @organization.create(global_options, options)
+        puts @organization.message
+      else
+        exit_now!(@organization.message)
+      end
+    end
+  end
+end
+
 desc 'Project Management'
 arg_name 'project'
 
@@ -31,8 +102,10 @@ command :project do |c|
   c.default_desc 'Manage Projects'
 
   c.flag [:name], desc: 'Name'
+  c.flag [:key], desc: 'Key'
   c.flag [:description], desc: 'Description'
   c.flag [:passphrase], desc: 'Passphrase'
+  c.flag [:organization], desc: 'Organization Key'
 
   @project = Project.new
 
@@ -42,42 +115,15 @@ command :project do |c|
   c.command :create do |c1|
     c1.action do |global_options, options|
       help_now!('name is required') if options[:name].nil?
+      help_now!('key is required') if options[:key].nil?
       help_now!('description is required') if options[:description].nil?
       help_now!('passphrase is required') if options[:passphrase].nil?
+      help_now!('organization key is required') if options[:organization].nil?
 
       if @project.create(global_options, options)
         puts @project.message
       else
         exit_now!(@project.message)
-      end
-    end
-  end
-end
-
-desc 'Client Management'
-arg_name 'client'
-
-command :client do |c|
-  c.default_desc 'Manage Clients'
-
-  c.flag [:name], desc: 'Name'
-  c.flag [:public_key], desc: 'SSH Public Key',
-                        default_value: public_key_default
-
-  @client = Client.new
-
-  c.desc 'Create'
-  arg_name 'create'
-
-  c.command :create do |c1|
-    c1.action do |global_options, options|
-      help_now!('name is required') if options[:name].nil?
-      help_now!('public_key is required') if options[:public_key].nil?
-
-      if @client.create(global_options, options)
-        puts @client.message
-      else
-        exit_now!(@client.message)
       end
     end
   end
@@ -119,38 +165,34 @@ command :key do |c|
       end
     end
   end
+end
 
-  # c.desc 'Sign your local ssh public key'
-  # arg_name 'sign'
+desc 'SSH Certificate Management'
+arg_name 'certificate'
 
-  # c.command :sign do |c1|
-  #   c1.flag [:p, :public_key], desc: "Your SSH Pubic Key"
+command :certificate do |c|
+  c.default_desc 'Manage your SSH Certificates'
 
-  #   c1.action do |global_options,options,args|
-  #     puts "Signing public key."
+  c.flag [:client], desc: 'Client name to sign'
 
-  #     if options[:p] != public_key_default
-  #       options[:p] = ask("Enter public key to submit (#{public_key_default}): ")
-  #       options[:p] = public_key_default if options[:p].empty?
-  #       exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
-  #     end
+  @certificate = Certificate.new
 
-  #     exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
+  c.desc 'Sign your ssh public key'
+  arg_name 'sign'
 
-  #     FentonShell::Key.sign(global_options,options,args)
-  #   end
-  # end
+  c.command :sign do |c1|
+    c1.action do |global_options,options,args|
+      help_now!('client name is required') if options[:client].nil?
 
-  # c.desc 'Get information about your keys'
-  # arg_name 'show'
+      puts "Signing public key for client: #{options[:client]}"
 
-  # c.command :show do |c1|
-  #   c1.command :ca do |c2|
-  #     c2.action do |global_options,options,args|
-  #       FentonShell::Key.ca_public_key(global_options,options,args)
-  #     end
-  #   end
-  # end
+      if @certificate.create(global_options,options)
+        puts @certificate.message
+      else
+        exit_now!(@certificate.message)
+      end
+    end
+  end
 end
 
 # desc 'Client Management'

@@ -8,6 +8,8 @@ Interacts with Fenton Server to download a signed SSH key for authentication to 
 
 Not recommended at this time
 
+    `gem install fenton_shell -P MediumSecurity`
+
 ### Shell Completion
 
 ```

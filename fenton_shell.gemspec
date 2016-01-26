@@ -8,14 +8,16 @@ Gem::Specification.new do |s|
   s.platform          = Gem::Platform::RUBY
   s.authors           = ["Nick Willever"]
   s.email             = ["nickwillever@gmail.com"]
-  s.homepage          = ""
+  s.homepage          = "https://github.com/fenton-project/fenton_shell"
   s.summary           = %q{A command line client to manage and sign SSH keys via Fenton Server}
   s.description       = s.summary
   s.license           = "Apache License, Version 2.0"
 
+  s.cert_chain        = ['certs/nictrix.pem']
+  s.signing_key       = File.join(Gem.user_home, ".ssh", "gem-private_key.pem") if $0 =~ /gem\z/
+
   s.has_rdoc          = true
-  s.extra_rdoc_files  = ["README.md", "LICENSE",'fenton_shell.rdoc' ]
-  s.rdoc_options      << '--title' << 'fenton' << '--main' << 'README.rdoc' << '-ri'
+  s.extra_rdoc_files  = ["README.md", "LICENSE"]
 
   s.bindir            = "bin"
   s.executables       = ["fenton"]

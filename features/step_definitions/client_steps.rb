@@ -1,4 +1,6 @@
-When %r{I create a client for "([^"]*)" with a public key} do |client_name|
-  step %(I run `#{@app_name} client create --name '#{client_name}' "\
-    "--public_key #{@public_key_path}`)
+When %r{I signup a client with username "([^"]*)" named "([^"]*)" with a public key} do |username,client_name|
+  command = "#{@app_name} client signup #{username} " \
+    "--name '#{client_name}' --email #{username}@example.com " \
+    "--password #{username} --public_key #{@public_key_path}"
+  step %(I run `#{command}`)
 end

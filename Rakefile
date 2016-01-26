@@ -6,6 +6,7 @@ require 'yard'
 require 'cucumber'
 require 'cucumber/rake/task'
 require 'rubocop/rake_task'
+require 'digest/sha2'
 
 RuboCop::RakeTask.new
 
@@ -48,6 +49,16 @@ require 'rake/testtask'
 Rake::TestTask.new do |t|
   t.libs << 'test'
   t.test_files = FileList['test/*_test.rb']
+end
+
+name = Gem::PackageTask.new(spec).name
+
+desc "Write checksum for #{name}.gem file"
+task 'package:checksum' do
+  built_gem_path = "pkg/#{name}.gem"
+  checksum = Digest::SHA512.new.hexdigest(File.read(built_gem_path))
+  checksum_path = "checksum/#{name}.gem.sha512"
+  File.open(checksum_path, 'w' ) {|f| f.write(checksum) }
 end
 
 task default: [:test, :features]
