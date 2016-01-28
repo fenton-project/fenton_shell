@@ -7,7 +7,7 @@ Before do |scenario|
       File.dirname(__FILE__)
     ),
     '..', '..', 'tmp', 'aruba', 'client_public_key'
-    )
+  )
   k = ::SSHKey.generate(type: 'RSA', bits: 256)
-  ::File.write(@public_key_path,k.ssh_public_key)
+  ::File.write(@public_key_path, k.ssh_public_key)
 end

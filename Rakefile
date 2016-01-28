@@ -58,7 +58,7 @@ task 'package:checksum' do
   built_gem_path = "pkg/#{name}.gem"
   checksum = Digest::SHA512.new.hexdigest(File.read(built_gem_path))
   checksum_path = "checksum/#{name}.gem.sha512"
-  File.open(checksum_path, 'w' ) {|f| f.write(checksum) }
+  File.open(checksum_path, 'w') { |f| f.write(checksum) }
 end
 
 task default: [:test, :features]

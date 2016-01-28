@@ -1,4 +1,4 @@
-# https://github.com/cucumber/aruba/tree/master/features/getting_started
+# https://cucumber.io/docs/reference
 
 require 'aruba/cucumber'
 

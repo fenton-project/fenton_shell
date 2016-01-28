@@ -18,7 +18,7 @@ class OrganizationTest < Test::Unit::TestCase
   def options
     {
       name: 'My Org',
-      key: 'myorg',
+      key: 'myorg'
     }
   end
 

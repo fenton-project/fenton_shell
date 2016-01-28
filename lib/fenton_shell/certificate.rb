@@ -39,7 +39,9 @@ module FentonShell
         headers: { 'Content-Type' => 'application/json' }
       )
 
-      write_client_certificate((JSON.parse(result.body))["data"]["attributes"]["certificate"])
+      write_client_certificate(
+        JSON.parse(result.body)['data']['attributes']['certificate']
+      )
 
       [result.status, JSON.parse(result.body)]
     end

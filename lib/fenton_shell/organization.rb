@@ -51,7 +51,6 @@ module FentonShell
         organization: {
           name: options[:name],
           key: options[:key]
-          # clients: options[:clients]
         }
       }.to_json
     end

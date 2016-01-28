@@ -17,7 +17,8 @@ Gem::Specification.new do |s|
   s.signing_key       = File.join(Gem.user_home, ".ssh", "gem-private_key.pem") if $0 =~ /gem\z/
 
   s.has_rdoc          = true
-  s.extra_rdoc_files  = ["README.md", "LICENSE"]
+  s.rdoc_options      = ["--charset=UTF-8"]
+  s.extra_rdoc_files  = %w(README.md LICENSE)
 
   s.bindir            = "bin"
   s.executables       = ["fenton"]

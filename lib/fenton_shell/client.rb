@@ -32,22 +32,16 @@ module FentonShell
     # @return [String] success or failure message
 
     def create_with_organization(global_options, options)
-      if create(global_options, options)
-        organization_options = {
-          name: options[:username],
-          key: options[:username],
-          clients: [options[:username]]
-        }
+      create(global_options, options)
+      organization_options = {
+        name: options[:username], key: options[:username] }
 
-        organization = Organization.new
-
-        if organization.create(global_options, organization_options)
-          save_message('Organization': ['created!'])
-          true
-        else
-          save_message('Organization': ['not created!'])
-          false
-        end
+      if Organization.new.create(global_options, organization_options)
+        save_message('Organization': ['created!'])
+        true
+      else
+        save_message('Organization': ['not created!'])
+        false
       end
     end
 
