@@ -45,7 +45,7 @@ command :clients do |c|
   c.command :signup do |c1|
     c1.action do |global_options, options, args|
       help_now!('username is required') if args.empty?
-      options[:username] = args.first
+      options[:username] = args.join(' ')
 
       puts "Creating client with username: #{options[:username]}\n\n"
       options[:name] ||= ask('Name: ')
@@ -58,11 +58,14 @@ command :clients do |c|
       help_now!('password is required') if options[:password].nil?
       help_now!('public_key is required') if options[:public_key].nil?
 
+      exit_now!("#{options[:public_key]} does not exist" \
+          ", please create one with `fenton keys generate -h`") if !File.exist?(options[:public_key])
+
       if @client.create_with_organization(global_options, options)
         if File.exist?("#{global_options[:directory]}/config")
           answer = ask('File exists ' \
             "#{global_options[:directory]}/config, overwrite? (y/N) ")
-          exit_now!('not overwriting the file') unless answer =~ %r{^y$}i
+          exit_now!('Please choose a different file path') unless answer =~ %r{^y$}i
         end
 
         @config.create(global_options, options)
@@ -86,13 +89,13 @@ command :organizations do |c|
 
   @organization = Organization.new
 
-  c.desc 'Create'
+  c.desc 'Create an organization (<name> --key)'
   arg_name 'create'
 
   c.command :create do |c1|
     c1.action do |global_options, options, args|
       help_now!('name is required') if args.empty?
-      options[:name] = args.first
+      options[:name] = args.join(' ')
 
       help_now!('key is required') if options[:key].nil?
 
@@ -116,24 +119,28 @@ command :projects do |c|
   c.flag [:key], desc: 'Key'
   c.flag [:description], desc: 'Description'
   c.flag [:passphrase], desc: 'Passphrase'
-  c.flag [:organization], desc: 'Organization Key'
+  c.flag [:organization], desc: 'Organization Key (default: client username)'
 
   @project = Project.new
 
-  c.desc 'Create'
+  c.desc 'Create a project (<name> --key --description --passphrase --organization)'
   arg_name 'create'
 
   c.command :create do |c1|
     c1.action do |global_options, options, args|
       help_now!('name is required') if args.empty?
-      options[:name] = args.first
+      options[:name] = args.join(' ')
+
+      options[:organization] ||= ConfigFile.default_organization(global_options)
+
+      puts "Creating project #{options[:name]} under organization #{options[:organization]}\n\n"
+
+      options[:passphrase] ||= ask('Create a passphrase: ') { |i| i.echo = '*' }
 
       help_now!('key is required') if options[:key].nil?
       help_now!('description is required') if options[:description].nil?
       help_now!('passphrase is required') if options[:passphrase].nil?
       help_now!('organization key is required') if options[:organization].nil?
-
-      puts "Creating project with name: #{options[:name]}\n\n"
 
       if @project.create(global_options, options)
         puts @project.message
@@ -168,7 +175,7 @@ command :keys do |c|
 
       if File.exist?(options[:private_key])
         answer = ask('File exists, overwrite? (y/N) ')
-        exit_now!('choose a different file path') unless answer =~ %r{^y$}i
+        exit_now!('Please choose a different file path') unless answer =~ %r{^y$}i
       end
 
       options[:passphrase] ||= ask('Enter passphrase: ') { |i| i.echo = '*' }

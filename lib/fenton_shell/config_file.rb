@@ -23,7 +23,23 @@ module FentonShell
       end
     end
 
+    # Responds with the default organization
+    #
+    # @param global_options [Hash] global command line options
+    # @return [String] default organization key for client
+    def self.default_organization(global_options)
+      config_file['default_organization']
+    end
+
     private
+
+    # Loads the configuration file content
+    #
+    # @param global_options [Hash] global command line options
+    # @return [Hash] content from yaml config file
+    def config_file(global_options)
+      YAML.load_file("#{global_options[:directory]}/config")
+    end
 
     # Creates the configuration file
     #
