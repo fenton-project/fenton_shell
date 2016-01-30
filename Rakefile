@@ -7,6 +7,7 @@ require 'cucumber'
 require 'cucumber/rake/task'
 require 'rubocop/rake_task'
 require 'digest/sha2'
+require 'bundler/audit/cli'
 
 RuboCop::RakeTask.new
 
@@ -59,6 +60,15 @@ task 'package:checksum' do
   checksum = Digest::SHA512.new.hexdigest(File.read(built_gem_path))
   checksum_path = "checksum/#{name}.gem.sha512"
   File.open(checksum_path, 'w') { |f| f.write(checksum) }
+end
+
+namespace :bundler do
+  desc 'Updates the ruby-advisory-db and runs audit'
+  task :audit do
+    %w(update check).each do |command|
+      Bundler::Audit::CLI.start [command]
+    end
+  end
 end
 
 task default: [:test, :features]
