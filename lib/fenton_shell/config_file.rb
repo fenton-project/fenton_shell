@@ -27,7 +27,7 @@ module FentonShell
     #
     # @param global_options [Hash] global command line options
     # @return [String] default organization key for client
-    def self.default_organization(global_options)
+    def self.default_organization(_global_options)
       config_file['default_organization']
     end
 
