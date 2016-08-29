@@ -38,4 +38,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency('yard')
   s.add_development_dependency('rubocop')
   s.add_development_dependency('bundler-audit')
+  s.add_development_dependency('rubycritic')
+  s.add_development_dependency('mixlib-shellout')
 end

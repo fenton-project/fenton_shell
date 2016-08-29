@@ -31,10 +31,14 @@ module FentonShell
     # @return [String] message on success or failure
     def key_create(options)
       ssh_key = key_generation(options)
+      ssh_private_key_file = options[:private_key]
+      ssh_public_key_file = "#{ssh_private_key_file}.pub"
 
       # TODO: - add to .fenton/config file
-      File.write(options[:private_key], ssh_key.private_key)
-      File.write("#{options[:private_key]}.pub", ssh_key.ssh_public_key)
+      File.write(ssh_private_key_file, ssh_key.private_key)
+      File.chmod(0o600, ssh_private_key_file)
+      File.write(ssh_public_key_file, ssh_key.ssh_public_key)
+      File.chmod(0o600, ssh_public_key_file)
 
       [true, 'Key': ['creation failed']]
     end

@@ -1,5 +1,6 @@
 require 'test_helper'
 
+# Validate organization api calls to Fenton
 class OrganizationTest < Test::Unit::TestCase
   def setup
     @organization = Organization.new

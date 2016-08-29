@@ -16,18 +16,30 @@ switch 'verbose'
 
 sort_help :manually
 
-private_key_default = "#{Dir.home}/.ssh/id_rsa"
+pre_config = begin
+               YAML.load_file("#{Dir.home}/.fenton/config")
+             rescue
+               {}
+             end
+private_key_default = begin
+                        pre_config[:public_key].gsub('.pub', '')
+                      rescue
+                        "#{Dir.home}/.ssh/id_rsa"
+                      end
 public_key_default = "#{private_key_default}.pub"
 
-flag [:z, :fenton_server_url], desc: 'Fenton Server URL',
-                               default_value: 'http://localhost:9292'
+default_fenton_directory = "#{Dir.home}/.fenton"
+
+flag [:z, :fenton_server_url],
+     desc: 'Fenton Server URL',
+     default_value: pre_config[:fenton_server_url] || 'http://localhost:9292'
 flag [:d, :directory], desc: 'Fenton Directory Path',
-                       default_value: "#{Dir.home}/.fenton"
+                       default_value: default_fenton_directory
 
 desc 'Client Management'
-arg_name 'clients'
+arg_name 'client'
 
-command :clients do |c|
+command :client do |c|
   c.default_desc 'Manage Clients'
 
   c.flag [:name], desc: 'Name'
@@ -47,7 +59,8 @@ command :clients do |c|
       help_now!('username is required') if args.empty?
       options[:username] = args.join(' ')
 
-      puts "Creating client with username: #{options[:username]}\n\n"
+      puts "Creating client with username: #{options[:username]}\n"
+      puts "Using public key: #{options['public_key']}\n\n"
       options[:name] ||= ask('Name: ')
       options[:email] ||= ask('Email: ')
       options[:password] ||= ask('Create a password: ') { |i| i.echo = '*' }
@@ -81,9 +94,9 @@ command :clients do |c|
 end
 
 desc 'Organization Management'
-arg_name 'organizations'
+arg_name 'organization'
 
-command :organizations do |c|
+command :organization do |c|
   c.default_desc 'Manage Organizations'
 
   c.flag [:key], desc: 'Key'
@@ -112,9 +125,9 @@ command :organizations do |c|
 end
 
 desc 'Project Management'
-arg_name 'projects'
+arg_name 'project'
 
-command :projects do |c|
+command :project do |c|
   c.default_desc 'Manage Projects'
 
   c.flag [:key], desc: 'Key'
@@ -155,20 +168,19 @@ command :projects do |c|
 end
 
 desc 'SSH Key Management'
-arg_name 'keys'
+arg_name 'key'
 
-command :keys do |c|
+command :key do |c|
   c.default_desc 'Manage your SSH Keys'
-
-  c.flag [:type], desc: 'RSA or DSA', default_value: 'rsa'
-  c.flag [:bits], desc: 'Size of key', type: Integer, default_value: 4096
 
   @key = Key.new
 
-  c.desc 'Generate a ssh key'
+  c.desc 'Generate a ssh key (--private_key --passphrase --type --bits)'
   arg_name 'generate'
 
   c.command :generate do |c1|
+    c1.flag [:type], desc: 'RSA or DSA', default_value: 'rsa'
+    c1.flag [:bits], desc: 'Size of key', type: Integer, default_value: 4096
     c1.flag [:private_key], desc: 'Private key file path to use',
                             default_value: private_key_default
     c1.flag [:passphrase], desc: 'Passphrase that protects the private key'
@@ -190,28 +202,25 @@ command :keys do |c|
       end
     end
   end
-end
 
-desc 'SSH Certificate Management'
-arg_name 'certificates'
-
-command :certificates do |c|
-  c.default_desc 'Manage your SSH Certificates'
-
-  c.flag [:client], desc: 'Client name to sign'
-  c.flag [:project], desc: 'Project to sign with'
-
-  @certificate = Certificate.new
-
-  c.desc 'Sign your ssh public key'
+  c.desc 'Sign your ssh public key (--project --client --public_key)'
   arg_name 'sign'
 
   c.command :sign do |c1|
-    c1.action do |global_options, options|
-      help_now!('client name is required') if options[:client].nil?
-      help_now!('project name is required') if options[:project].nil?
+    @certificate = Certificate.new
 
-      puts "Signing public key for client: #{options[:client]}"
+    c1.flag [:project], desc: 'Project key to sign with'
+
+    c1.action do |global_options, options|
+      options[:client] ||= ConfigFile.username(global_options)
+      options[:public_key] ||= ConfigFile.public_key(global_options)
+
+      help_now!('client username is required') if options[:client].nil?
+      help_now!('project key is required') if options[:project].nil?
+      help_now!('public key is required') if options[:public_key].nil?
+
+      puts "Signing public key (#{options[:public_key]}) " \
+      "for client: #{options[:client]}"
 
       if @certificate.create(global_options, options)
         puts @certificate.message
@@ -222,24 +231,34 @@ command :certificates do |c|
   end
 end
 
-# desc 'SSH to servers the Fenton way'
-# arg_name 'ssh'
+desc 'Machine Management'
+arg_name 'machine'
 
-# command :ssh do |c|
-#   c.action do |global_options,options,args|
-#     c1.flag [:p, :public_key], desc: "Your SSH Pubic Key"
+command :machine do |c|
+  c.desc 'SSH to a machine <[user@]ip|host> (--private_key --command)'
+  arg_name 'ssh'
 
-#     if options[:p] != public_key_default
-#       options[:p] = ask("Enter public key to submit (#{public_key_default}): ")
-#       options[:p] = public_key_default if options[:p].empty?
-#       exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
-#     end
+  c.command :ssh do |c1|
+    c1.flag [:private_key], desc: 'Private key file path to use',
+                            default_value: private_key_default
+    c1.flag [:command], desc: 'Command to run for non-interactive sessions'
 
-#     exit_now!("No file found by that name #{options[:p]}") unless File.exists?(options[:p])
+    c1.action do |_global_options, options, args|
+      help_now!('machine is required') if args.empty?
+      options[:machine] = args.join(' ')
 
-#     FentonShell::Ssh.ssh(global_options,options,args)
-#   end
-# end
+      command = "-n '#{options[:command]}'" if options[:command]
+      ssh_command = "ssh -tt -q #{options[:machine]} " \
+      "-i #{options[:private_key]} #{command}"
+
+      if command
+        puts `#{ssh_command}`
+      else
+        exec(ssh_command)
+      end
+    end
+  end
+end
 
 on_error do |ex|
   puts ex

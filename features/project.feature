@@ -4,5 +4,5 @@ Feature: Project Functions
 
   Scenario: Create a project
     When I create a project named "Production Machines" with key "productionmachines" for "myorg"
-    Then the stdout should contain "Project created!"
+    Then the stdout should contain "Project Created! Below is the public key to add to the server"
     Then the exit status should be 0

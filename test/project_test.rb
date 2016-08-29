@@ -1,5 +1,6 @@
 require 'test_helper'
 
+# Validate project api calls to Fenton
 class ProjectTest < Test::Unit::TestCase
   def setup
     @project = Project.new
@@ -29,7 +30,7 @@ class ProjectTest < Test::Unit::TestCase
     project_result = @project.create(global_options, options)
 
     assert project_result
-    assert_equal "Project created!\n", @project.message
+    assert_match %r{Project Created!}, @project.message
   end
 
   def test_project_creation_missing_name

@@ -2,13 +2,15 @@ require 'test_helper'
 require 'sshkey'
 require 'fileutils'
 
+# Validate client api calls to Fenton
 class ClientTest < Test::Unit::TestCase
   def setup
     @client = Client.new
     @public_key_path = 'tmp/test/client_public_key'
     @public_key = File.write(@public_key_path,
                              ::SSHKey.generate(
-                               type: 'RSA', bits: 256).ssh_public_key)
+                               type: 'RSA', bits: 256
+                             ).ssh_public_key)
   end
 
   def teardown

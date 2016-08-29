@@ -3,6 +3,7 @@ require 'sshkey'
 require 'tempfile'
 require 'fileutils'
 
+# Validate certificate api calls to Fenton
 class CertificateTest < Test::Unit::TestCase
   def setup
     @certificate = Certificate.new
@@ -20,8 +21,9 @@ class CertificateTest < Test::Unit::TestCase
 
   def options
     {
-      client: 'Foo Barz',
-      project: 'Production Machines'
+      client: 'foobarz',
+      project: 'productionmachines',
+      public_key: 'tmp/test/key_private_key.pub'
     }
   end
 

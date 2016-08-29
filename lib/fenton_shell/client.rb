@@ -33,10 +33,9 @@ module FentonShell
 
     def create_with_organization(global_options, options)
       create(global_options, options)
-      organization_options = {
-        name: options[:username], key: options[:username] }
 
-      if Organization.new.create(global_options, organization_options)
+      if Organization.new.create(global_options, name: options[:username],
+                                                 key: options[:username])
         save_message('Organization': ['created!'])
         true
       else
@@ -70,7 +69,9 @@ module FentonShell
     def client_json(options)
       {
         client: {
+          username: options[:username],
           name: options[:name],
+          email: options[:email],
           public_key: File.read(options[:public_key])
         }
       }.to_json

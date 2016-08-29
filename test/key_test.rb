@@ -1,5 +1,6 @@
 require 'test_helper'
 
+# Validate we can create ssh keys
 class KeyTest < Test::Unit::TestCase
   def setup
     @key = Key.new

@@ -16,15 +16,28 @@ module FentonShell
       status, body = project_create(global_options, options)
 
       if status == 201
-        save_message('Project': ['created!'])
+        save_message(create_success_message(body))
         true
       else
-        save_message(body)
+        parse_message(body)
         false
       end
     end
 
     private
+
+    def create_success_message(body)
+      msg = "Project Created! Below is the public key to add to the server.\n\n"
+      msg << "#{body['data']['attributes']['ca-public-key']}\n\n"
+      msg << "Add the public key above to /etc/ssh/trusted_user_ca_key\n\n"
+      msg << "Add this line to /etc/ssh/sshd_config\n"
+      msg << "  TrustedUserCAKeys /etc/ssh/trusted_user_ca_key\n\n"
+      msg << "Run these commands:\n"
+      msg << '  chmod 644 /etc/ssh/trusted_user_ca_key && ' \
+      "service ssh restart\n\n"
+      msg << 'Now have Fenton Server sign your public key to ' \
+      "login to the server\n"
+    end
 
     # Sends a post request with json from the command line client
     #
@@ -62,12 +75,17 @@ module FentonShell
     #
     # @param msg [Hash] fields from fenton public classes
     # @return [String] changed hash fields to string for command line output
-    def save_message(msg = {})
+    def parse_message(msg = {})
       self.message ||= ''
 
       msg.each do |key, value|
         self.message << "#{key.capitalize} #{value.first}\n"
       end
+    end
+
+    def save_message(msg)
+      self.message ||= ''
+      self.message << msg.to_s
     end
   end
 end

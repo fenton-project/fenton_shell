@@ -8,6 +8,7 @@ require 'cucumber/rake/task'
 require 'rubocop/rake_task'
 require 'digest/sha2'
 require 'bundler/audit/cli'
+require 'mixlib/shellout'
 
 RuboCop::RakeTask.new
 
@@ -69,6 +70,15 @@ namespace :bundler do
       Bundler::Audit::CLI.start [command]
     end
   end
+end
+
+desc 'RubyCritic'
+task 'rubycritic' do
+  command = Mixlib::ShellOut.new('rubycritic -f console -s 100')
+  command.live_stdout = $stdout
+  command.live_stderr = $stderr
+  command.run_command
+  exit command.exitstatus
 end
 
 task default: [:test, :features]

@@ -11,7 +11,6 @@ module FentonShell
     # @param global_options [Hash] global command line options
     # @param options [Hash] json fields to send to fenton server
     # @return [String] success or failure message
-
     def create(global_options, options)
       status, body = certificate_create(global_options, options)
 
@@ -40,15 +39,20 @@ module FentonShell
       )
 
       write_client_certificate(
+        public_key_cert_location(options[:public_key]),
         JSON.parse(result.body)['data']['attributes']['certificate']
       )
 
       [result.status, JSON.parse(result.body)]
     end
 
-    def write_client_certificate(content)
-      # TODO : write in same directory with similar name as public key
-      puts content.inspect
+    def write_client_certificate(file_path, content)
+      File.write(file_path, content)
+      File.chmod(0o600, file_path)
+    end
+
+    def public_key_cert_location(public_key_location)
+      public_key_location.gsub(%r{\.pub}, '-cert.pub')
     end
 
     # Formulates the certificate json for the post request

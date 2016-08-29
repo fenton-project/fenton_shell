@@ -23,23 +23,43 @@ module FentonShell
       end
     end
 
-    # Responds with the default organization
-    #
-    # @param global_options [Hash] global command line options
-    # @return [String] default organization key for client
-    def self.default_organization(_global_options)
-      config_file['default_organization']
+    class << self
+      # Responds with the default organization
+      #
+      # @param global_options [Hash] global command line options
+      # @return [String] default organization key for client
+      def default_organization(global_options)
+        config_file(global_options)[:default_organization]
+      end
+
+      # Responds with the default username
+      #
+      # @param global_options [Hash] global command line options
+      # @return [String] default username for client
+      def username(global_options)
+        config_file(global_options)[:username]
+      end
+
+      # Responds with the default public key
+      #
+      # @param global_options [Hash] global command line options
+      # @return [String] default public key for client
+      def public_key(global_options)
+        config_file(global_options)[:public_key]
+      end
+
+      private
+
+      # Loads the configuration file content
+      #
+      # @param global_options [Hash] global command line options
+      # @return [Hash] content from yaml config file
+      def config_file(global_options)
+        YAML.load_file("#{global_options[:directory]}/config")
+      end
     end
 
     private
-
-    # Loads the configuration file content
-    #
-    # @param global_options [Hash] global command line options
-    # @return [Hash] content from yaml config file
-    def config_file(global_options)
-      YAML.load_file("#{global_options[:directory]}/config")
-    end
 
     # Creates the configuration file
     #
@@ -50,7 +70,8 @@ module FentonShell
       config_directory_create(global_options)
 
       file = "#{global_options[:directory]}/config"
-      content = config_generation(file, options)
+      options.store(:fenton_server_url, global_options[:fenton_server_url])
+      content = config_generation(options)
       File.write(file, content)
 
       [true, 'ConfigFile': ['created!']]
@@ -60,16 +81,16 @@ module FentonShell
     #
     # @param options [Hash] fields from fenton command line
     # @return [String] true or false
-    def config_generation(file, options)
-      config_contents = File.exist?(file) ? YAML.load_file(file) : {}
+    def config_generation(options)
+      config_contents = {}
 
       config_options = options.keys.map(&:to_sym).sort.uniq
       config_options.delete(:password)
       config_options.each do |config_option|
-        config_contents.store(config_option.to_s, options[config_option])
+        config_contents.store(config_option.to_sym, options[config_option])
       end
 
-      config_contents.store('default_organization', options[:username])
+      config_contents.store(:default_organization, options[:username])
 
       config_contents.to_yaml
     end
