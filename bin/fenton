@@ -130,7 +130,7 @@ arg_name 'project'
 command :project do |c|
   c.default_desc 'Manage Projects'
 
-  c.flag [:key], desc: 'Key'
+  c.flag [:key], desc: 'Key (unique short acronym for the project)'
   c.flag [:description], desc: 'Description'
   c.flag [:passphrase], desc: 'Passphrase'
   c.flag [:organization], desc: 'Organization Key (default: client username)'
