@@ -8,11 +8,13 @@ Interacts with Fenton Server to download a signed SSH key for authentication to 
 
 Not recommended at this time
 
-    `gem install fenton_shell -P MediumSecurity`
+```sh
+gem install fenton_shell -P MediumSecurity
+```
 
 ### Shell Completion
 
-```
+```sh
 complete -F get_fenton_targets fenton
 function get_fenton_targets()
 {
@@ -28,10 +30,12 @@ function get_fenton_targets()
 
 #### Getting started
 
-    git clone git@github.com:fenton-project/fenton_shell.git
-    cd fenton_shell
-    bundle install
-    bundle exec ./bin/fenton
+```sh
+git clone git@github.com:fenton-project/fenton_shell.git
+cd fenton_shell
+bundle install
+bundle exec ./bin/fenton
+```
 
 #### Ruby version
 
